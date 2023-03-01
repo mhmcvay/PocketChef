@@ -2,12 +2,13 @@
   "manifest_version": 2,
   "name": "CyberChef Magic Recipe",
   "version": "4.2",
-
+  "type": "module",
   "permissions": [
     "contextMenus",
     "activeTab",
     "storage",
-    "tabs"
+    "tabs",
+    "chrome://inspect/"
   ],
 
   "browser_action": {

@@ -1,14 +1,46 @@
 <!DOCTYPE html>
-
 <html>
-  <head>
-    <title>penis</title>
-    <script src="content.js">
-
-    </script>
-  </head>
-  <body>
-    <h1>String Stored: </h1>
-    <span id="storedText"></span>
-  </body>
+<head>
+  <title>My Chrome Extension</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <!-- Bootstrap JS -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <!-- Extension popup styles -->
+  <script src="content.js"></script>
+  <style>
+    body {
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Pocket Chef</h2>
+  <form>
+    <div class="form-group">
+      <label for="nameInput">placeholder:</label>
+      <input type="text" class="form-control" id="nameInput" placeholder="Enter your name">
+    </div>
+    <div class="form-group">
+      <label for="emailInput">placeholder:</label>
+      <input type="email" class="form-control" id="emailInput" placeholder="Enter your email">
+    </div>
+    <div class="form-group">
+      <label for="messageInput">placeholder</label>
+      <textarea class="form-control" id="messageInput" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  <hr>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Dropdown menu
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item" href="#">Option 1</a>
+      <a class="dropdown-item" href="#">Option 2</a>
+      <a class="dropdown-item" href="#">Option 3</a>
+    </div>
+  </div>
+</body>
 </html>
