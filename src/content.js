@@ -1,28 +1,28 @@
-console.log('content')
-// Listen for form submit event
-document.querySelector('form').addEventListener('submit', function(event) {
-  // Prevent the form from submitting
-  event.preventDefault();
-
-  // Retrieve the form values
-  const name = document.querySelector('#nameInput').value;
-  const email = document.querySelector('#emailInput').value;
-  const message = document.querySelector('#messageInput').value;
-
-  // Show an alert with the form values
-  alert(`Name: ${name}\nEmail: ${email}\nMessage: ${message}`);
+/*
+document.getElementById("test_form").addEventListener("submit", function(e){
+  e.preventDefault();
+  var name = document.getElementById("nameInput").value;
+  console.log(name);
+});
+*/
+const urlForm = document.getElementById('url-form');
+urlForm.addEventListener('submit', function(event) {
+  event.preventDefault(); // Prevent the form from submitting normally
+  
+  const data = new FormData(urlForm);
+  const encoded = encodeURIComponent(data.get('url-input'));
+  
+  alert(`Encoded URL: ${encoded}`);
 });
 
-// Listen for dropdown item click event
-document.querySelectorAll('.dropdown-item').forEach(function(item) {
-  item.addEventListener('click', function(event) {
-    // Prevent the default link behavior
-    event.preventDefault();
-
-    // Retrieve the selected option text
-    const optionText = event.target.textContent;
-
-    // Show an alert with the selected option
-    alert(`Selected option: ${optionText}`);
-  });
+const base64Form = document.getElementById('base64-form');
+base64Form.addEventListener('submit', function(event) {
+  event.preventDefault(); // Prevent the form from submitting normally
+  
+  const data = new FormData(base64Form);
+  const encoded = btoa(data.get('base64-input'));
+  
+  alert(`Encoded text: ${encoded}`);
 });
+
+
