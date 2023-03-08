@@ -1,28 +1,44 @@
-/*
-document.getElementById("test_form").addEventListener("submit", function(e){
-  e.preventDefault();
-  var name = document.getElementById("nameInput").value;
-  console.log(name);
-});
-*/
-const urlForm = document.getElementById('url-form');
-urlForm.addEventListener('submit', function(event) {
-  event.preventDefault(); // Prevent the form from submitting normally
-  
-  const data = new FormData(urlForm);
-  const encoded = encodeURIComponent(data.get('url-input'));
-  
-  alert(`Encoded URL: ${encoded}`);
-});
-
-const base64Form = document.getElementById('base64-form');
-base64Form.addEventListener('submit', function(event) {
-  event.preventDefault(); // Prevent the form from submitting normally
-  
-  const data = new FormData(base64Form);
-  const encoded = btoa(data.get('base64-input'));
-  
-  alert(`Encoded text: ${encoded}`);
+// handle encode/decode button clicks
+document.getElementById('encode-button').addEventListener('click', function() {
+  var inputText = document.getElementById('input-text').value;
+  var method = document.getElementById('select-method').value;
+  var outputText = '';
+  switch (method) {
+    case 'base64':
+      outputText = btoa(inputText);
+      break;
+    case 'url':
+      outputText = encodeURIComponent(inputText);
+      break;
+    case 'rot13':
+      outputText = rot13(inputText);
+      break;
+  }
+  document.getElementById('output-text').value = outputText;
 });
 
+document.getElementById('decode-button').addEventListener('click', function() {
+  var inputText = document.getElementById('input-text').value;
+  var method = document.getElementById('select-method').value;
+  var outputText = '';
+  switch (method) {
+    case 'base64':
+      outputText = atob(inputText);
+      break;
+    case 'url':
+      outputText = decodeURIComponent(inputText);
+      break;
+    case 'rot13':
+      outputText = rot13(inputText);
+      break;
+  }
+  document.getElementById('output-text').value = outputText;
+});
 
+// ROT13 implementation
+function rot13(str) {
+  var input = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  var output = 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm';
+  var index = x => input.indexOf(x);
+  return str.split('').map(x => index(x) > -1 ? output[index(x)] : x).join('');
+}
