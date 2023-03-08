@@ -7,15 +7,22 @@ chrome.runtime.onInstalled.addListener(() => {
       title: "Magic on: \"%s\" ", 
       contexts: ["selection"], 
   })
+
+  /*
+  chrome.contextMenus.create({
+  title: "Sub-Menu Item 1",
+  parentId: "submit-text",
+  id: "submenu1",
+  contexts: ["all"]
+});
+  */
 });
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
     const inputValue = info.selectionText;
     console.log(inputValue);
     const encrypt = btoa(inputValue);
-    console.log(encrypt);
     var baseURL = "https://gchq.github.io/CyberChef/#recipe=Magic(3,false,false,'')&input=";
     var newURL = baseURL + encrypt.replace(/=*$/, '');
-    console.log(newURL);
     chrome.tabs.create({ url: newURL});
 });
