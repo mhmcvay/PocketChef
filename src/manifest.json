@@ -8,7 +8,9 @@
     "activeTab",
     "storage",
     "tabs",
-    "chrome://inspect/"
+    "chrome://inspect/",
+    "chrome",
+    "https://gchq.github.io/*"
   ],
 
   "browser_action": {
