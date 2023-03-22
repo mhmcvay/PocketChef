@@ -35,7 +35,10 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
       .then(jsonData => {
         console.log(jsonData);
         const finalVal = jsonData.value[0].data;
-        alert(finalVal);
+        if(finalVal == inputValue)
+          alert("MAGIC HAS NO CLUE");
+        else
+          alert(finalVal);
       });
 
     //If you want to make it open cyberchef
