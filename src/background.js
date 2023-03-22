@@ -1,5 +1,4 @@
 // background.js
-//import puppeteer from 'puppeteer-core';
 
 chrome.runtime.onInstalled.addListener(() => {
   //create context menu
@@ -15,31 +14,33 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
     const inputValue = info.selectionText;
     console.log(inputValue);
     const encrypt = btoa(inputValue);
-      var baseURL = "https://gchq.github.io/CyberChef/#recipe=Magic(3,false,false,'')&input=";
-      var newURL = baseURL + encrypt.replace(/=*$/, '');
-      chrome.tabs.create({ url: newURL});
+
+    const url = "http://localhost:3000/magic";
+    const data = {
+      input: inputValue,
+      args: {depth: 1}
+    };
+    const options = {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    };
+    fetch(url, options)
+      .then(response => {
+        return response.json();
+      })
+      .then(jsonData => {
+        console.log(jsonData);
+        const finalVal = jsonData.value[0].data;
+        alert(finalVal);
+      });
+
+    //If you want to make it open cyberchef
+    //var baseURL = "https://gchq.github.io/CyberChef/#recipe=Magic(3,false,false,'')&input=";
+    //var newURL = baseURL + encrypt.replace(/=*$/, '');
+    //chrome.tabs.create({ url: newURL});
+    
 });
-
-
-//Experimental
-/*
-chrome.contextMenus.onClicked.addListener(async function(info, tab) {
-  const inputValue = info.selectionText;
-  console.log(inputValue);
-  const encrypt = btoa(inputValue);
-  const baseURL = "https://gchq.github.io/CyberChef/#recipe=Magic(3,false,false,'')&input=";
-  const newURL = baseURL + encrypt.replace(/=*$/, '');
-  chrome.tabs.create({ url: newURL });
-
-  const browser = await puppeteer.launch({
-    executablePath: '~/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: true,
-  });
-  const page = await browser.newPage();
-  await page.goto(newURL);
-  await page.click('#output-format-text');
-  const output = await page.$eval('#output-text', el => el.value);
-  console.log(output);
-  await browser.close();
-});
-*/
