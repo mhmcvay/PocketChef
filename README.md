@@ -1,5 +1,8 @@
 # Pocket Chef - Capstone
 
+## CURRENTLY NEED OWN INSTANCE OF CYBERCHEF TO RUN
+## You can follow the gchq/Cyberchef-server to get your own instance
+
 This is a work in progress but is a MVP of my capstone project
 
 I am writing a chromium based extension that interfaces with CyberChef
