@@ -10,11 +10,9 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 
-chrome.contextMenus.onClicked.addListener(function(info, tab) {
+chrome.contextMenus.onClicked.addListener(function(info, tabs) {
     const inputValue = info.selectionText;
-    console.log(inputValue);
-    const encrypt = btoa(inputValue);
-
+    //console.log(inputValue);
     const url = "http://localhost:3000/magic";
     const data = {
       input: inputValue,
@@ -33,17 +31,37 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
         return response.json();
       })
       .then(jsonData => {
-        console.log(jsonData);
+        //console.log(jsonData);
         const finalVal = jsonData.value[0].data;
-        if(finalVal == inputValue)
+        if(finalVal === inputValue)
           alert("MAGIC HAS NO CLUE");
         else
+        {
+          //popup
           alert(finalVal);
+          
+              //send finalVal to front end
+              chrome.runtime.sendMessage({
+              msg: "something_completed", 
+              data: { subject: finalVal }
+              });
+
+          //copy val ot clipboard
+          const tempTextarea = document.createElement("textarea");
+          tempTextarea.value = finalVal;
+          document.body.appendChild(tempTextarea);
+          // Select the text within the textarea
+          tempTextarea.select();
+          tempTextarea.setSelectionRange(0, 99999); // For mobile devices
+          // Copy the selected text to the clipboard
+          document.execCommand("copy");
+          // Remove the temporary textarea element
+          document.body.removeChild(tempTextarea);
+        }
       });
 
     //If you want to make it open cyberchef
     //var baseURL = "https://gchq.github.io/CyberChef/#recipe=Magic(3,false,false,'')&input=";
     //var newURL = baseURL + encrypt.replace(/=*$/, '');
     //chrome.tabs.create({ url: newURL});
-    
 });

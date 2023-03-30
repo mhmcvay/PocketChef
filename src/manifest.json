@@ -10,7 +10,9 @@
     "tabs",
     "chrome://inspect/",
     "chrome",
-    "https://gchq.github.io/*"
+    "chrome.runtime",
+    "https://gchq.github.io/*",
+    "clipboardWrite"
   ],
 
   "browser_action": {

@@ -1,25 +1,28 @@
-// handle encode/decode button clicks
-/*
-const url = "https://gchq.github.io/CyberChef/#recipe=Magic(3,false,false,'')&input=cGVlcGVl";
-const xhr = new XMLHttpRequest();
-xhr.open('GET', url);
-xhr.send();
 
-xhr.onload = function() {
-  // Parse the HTML of the response
-  const response = xhr.response;
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(response, 'text/html');
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+      if (request.msg === "something_completed") {
+          //  To do something
+          console.log(request.data.subject)
+          console.log(request.data.content)
+          document.getElementById('output-text').value = request.data.subject;
+      }
+  }
+);
 
-  // Get the decoded value from the output box
-  const outputBox = doc.getElementById('output-text');
-  const decodedValue = outputBox.innerText;
 
-  // Do something with the decoded value
-  console.log(decodedValue);
-  document.getElementById('output-text').value = outputText;
-};
-*/
+const selectMethod = document.getElementById("select-method");
+selectMethod.addEventListener("change", function() {
+  const railFenceInput_rails = document.getElementById("railfence-input-rails");
+  const railFenceInput_off = document.getElementById("railfence-input-off");
+  if (this.value === "railfence") {
+    railFenceInput_rails.classList.remove("hidden");
+    railFenceInput_off.classList.remove("hidden");
+  } else {
+    railFenceInput_rails.classList.add("hidden");
+    railFenceInput_off.classList.add("hidden");
+  }
+});
 
 
 document.getElementById('encode-button').addEventListener('click', function() {
@@ -30,14 +33,14 @@ document.getElementById('encode-button').addEventListener('click', function() {
     case 'base64':
       outputText = btoa(inputText);
       break;
-    case 'url':
-      outputText = encodeURIComponent(inputText);
-      break;
     case 'rot13':
       outputText = rot13(inputText);
       break;
     case 'atbash':
       outputText = atbash(inputText);
+      break;
+    case 'railfence':
+      //outputText = railfence(inputText);
       break;
   }
   document.getElementById('output-text').value = outputText;
@@ -52,18 +55,45 @@ document.getElementById('decode-button').addEventListener('click', function() {
     case 'base64':
       outputText = atob(inputText);
       break;
-    case 'url':
-      outputText = decodeURIComponent(inputText);
-      break;
     case 'rot13':
       outputText = rot13(inputText);
       break;
     case 'atbash':
       outputText = atbash(inputText);
       break;
+    case 'railfence':
+      var rails = document.getElementById('railfence-rails').value;
+      var offset = document.getElementById('railfence-off').value;
+      outputText = railfence(inputText, rails, offset);
+      break;
   }
   document.getElementById('output-text').value = outputText;
 });
+
+function railfence(inputValue, rails, offset)
+{
+    fetch('http://localhost:3000/bake', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        input: inputValue,
+        recipe: [
+          {
+            op: 'Rail Fence Cipher Decode',
+            args: [rails, offset]
+          }
+        ]
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('output-text').value = data.value;
+    })
+    .catch(error => console.error(error));
+}
 
 // ROT13 implementation
 function rot13(str) {
