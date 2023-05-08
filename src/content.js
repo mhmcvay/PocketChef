@@ -1,4 +1,3 @@
-
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
       if (request.msg === "something_completed") {
@@ -22,6 +21,28 @@ selectMethod.addEventListener("change", function() {
     railFenceInput_rails.classList.add("hidden");
     railFenceInput_off.classList.add("hidden");
   }
+
+  const xorInputKeyType = document.getElementById("xor-input-key-type");
+  const xorInputKey = document.getElementById("xor-input-key");
+
+  if (this.value === "xor") {
+    xorInputKeyType.classList.remove("hidden");
+    xorInputKey.classList.remove("hidden");
+  } else {
+    xorInputKeyType.classList.add("hidden");
+    xorInputKey.classList.add("hidden");
+  }
+
+  /*
+  const vigInput = document.getElementById("vig-input-key");
+  if (this.value === "vigenere")
+  {
+    vigInput.classList.remove("hidden");
+  }
+  else{
+    vigInput.classList.add("hidden");
+  }
+  */
 });
 
 
@@ -40,7 +61,15 @@ document.getElementById('encode-button').addEventListener('click', function() {
       outputText = atbash(inputText);
       break;
     case 'railfence':
-      //outputText = railfence(inputText);
+      let rails = parseInt(document.getElementById('railfence-rails').value);
+      let offset = parseInt(document.getElementById('railfence-off').value);
+      outputText = railfence_enc(inputText, rails, offset);
+      console.log(outputText);
+      break;
+    case 'xor':
+      var type = document.getElementById('xor-key-type').value;
+      var key = document.getElementById('xor-key').value;
+      outputText = xor(inputText, type, key);
       break;
   }
   document.getElementById('output-text').value = outputText;
@@ -62,15 +91,70 @@ document.getElementById('decode-button').addEventListener('click', function() {
       outputText = atbash(inputText);
       break;
     case 'railfence':
-      var rails = document.getElementById('railfence-rails').value;
-      var offset = document.getElementById('railfence-off').value;
-      outputText = railfence(inputText, rails, offset);
+      let rails = parseInt(document.getElementById('railfence-rails').value);
+      let offset = parseInt(document.getElementById('railfence-off').value);
+      outputText = railfence_dec(inputText, rails, offset);
+      break;
+    case 'xor':
+      var type = document.getElementById('xor-key-type').value;
+      var key = document.getElementById('xor-key').value;
+      outputText = xor(inputText, type, key);
       break;
   }
   document.getElementById('output-text').value = outputText;
 });
 
-function railfence(inputValue, rails, offset)
+function xor(inputValue, type, key)
+{
+  fetch('http://localhost:3000/bake', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        input: inputValue,
+        recipe: [
+          {
+            op: 'XOR',
+            args: [{"option":type, "string":key}, "Standard", false]
+          }
+        ]
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('output-text').value = data.value;
+    })
+    .catch(error => console.error(error));
+}
+
+function railfence_enc(inputValue, rails, offset)
+{
+    fetch('http://localhost:3000/bake', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "input": inputValue,
+        "recipe":[
+        { "op": "Rail Fence Cipher Encode",
+          "args": [rails, offset] }
+      ]
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      document.getElementById('output-text').value = data.value;
+    })
+    .catch(error => console.error(error));
+}
+
+function railfence_dec(inputValue, rails, offset)
 {
     fetch('http://localhost:3000/bake', {
       method: 'POST',
@@ -90,12 +174,14 @@ function railfence(inputValue, rails, offset)
     })
     .then(response => response.json())
     .then(data => {
+      console.log(data);
       document.getElementById('output-text').value = data.value;
     })
     .catch(error => console.error(error));
 }
 
 // ROT13 implementation
+//no Cyberchef API bc it returns a byteArray ???
 function rot13(str) {
   var input = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   var output = 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm';
@@ -103,30 +189,25 @@ function rot13(str) {
   return str.split('').map(x => index(x) > -1 ? output[index(x)] : x).join('');
 }
 
-function atbash(str) {
-  // Define the alphabets to be used for encoding and decoding
-  const plain = 'abcdefghijklmnopqrstuvwxyz';
-  const cipher = 'zyxwvutsrqponmlkjihgfedcba';
-  
-  // Initialize an empty string to store the encrypted message
-  let encrypted = '';
-  
-  // Loop through each character in the input string
-  for (let i = 0; i < str.length; i++) {
-    // Check if the character is a letter
-    if (/[a-z]/i.test(str[i])) {
-      // Get the index of the letter in the plain alphabet
-      const index = plain.indexOf(str[i].toLowerCase());
-      // Get the corresponding letter from the cipher alphabet
-      const encryptedChar = cipher.charAt(index);
-      // Append the encrypted letter to the output string
-      encrypted += (str[i].toLowerCase() === str[i]) ? encryptedChar : encryptedChar.toUpperCase();
-    } else {
-      // If the character is not a letter, just append it as is
-      encrypted += str[i];
-    }
-  }
-  
-  return encrypted;
+function atbash(inputValue)
+{
+  fetch('http://localhost:3000/bake', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        input: inputValue,
+        recipe: [
+          { op: "Atbash Cipher",
+            args: [] }
+        ]
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('output-text').value = data.value;
+    })
+    .catch(error => console.error(error));
 }
-

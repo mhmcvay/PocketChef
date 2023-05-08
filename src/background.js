@@ -7,12 +7,19 @@ chrome.runtime.onInstalled.addListener(() => {
       title: "Magic on: \"%s\" ", 
       contexts: ["selection"], 
   })
+
+  chrome.contextMenus.create({
+    id: "submit-hash",
+    title: "Analyze Hash", 
+    contexts: ["selection"], 
+})
 });
 
 
 chrome.contextMenus.onClicked.addListener(function(info, tabs) {
+  if(info.menuItemId === "submit-magic"){
     const inputValue = info.selectionText;
-    //console.log(inputValue);
+    console.log(inputValue);
     const url = "http://localhost:3000/magic";
     const data = {
       input: inputValue,
@@ -39,8 +46,6 @@ chrome.contextMenus.onClicked.addListener(function(info, tabs) {
         {
           //popup
           alert(finalVal);
-          
-              //send finalVal to front end
               chrome.runtime.sendMessage({
               msg: "something_completed", 
               data: { subject: finalVal }
@@ -50,15 +55,37 @@ chrome.contextMenus.onClicked.addListener(function(info, tabs) {
           const tempTextarea = document.createElement("textarea");
           tempTextarea.value = finalVal;
           document.body.appendChild(tempTextarea);
-          // Select the text within the textarea
           tempTextarea.select();
-          tempTextarea.setSelectionRange(0, 99999); // For mobile devices
-          // Copy the selected text to the clipboard
+          tempTextarea.setSelectionRange(0, 99999);
           document.execCommand("copy");
-          // Remove the temporary textarea element
           document.body.removeChild(tempTextarea);
         }
       });
+    }
+    else if (info.menuItemId === "submit-hash")
+    {
+      const inputValue = info.selectionText;
+      fetch("http://localhost:3000/bake", {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "input": inputValue,
+          "recipe": [{
+            "op": "Analyse hash",
+            "args": []
+          }]
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          const finalVal = data.value;
+          alert(finalVal);
+        })
+        .catch(error => alert("ERROR: not a hash"));
+    }
 
     //If you want to make it open cyberchef
     //var baseURL = "https://gchq.github.io/CyberChef/#recipe=Magic(3,false,false,'')&input=";
